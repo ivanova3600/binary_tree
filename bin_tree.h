@@ -56,6 +56,9 @@ private:
 
     bool isEquual(const std::unique_ptr<Node> &node1, const std::unique_ptr<Node> &node2);
 
+    void printLevel(const std::unique_ptr<Node> &, size_t, size_t);
+    T toSummTree(Node *);
+
 // PUBLIC STARTS HERE !!!!!!!!!!!!!!!!!!!!!!!
 public:    
     explicit BinaryTree() { }
@@ -74,14 +77,119 @@ public:
 
     T getMin(); // поиск минимума
     T getMax(); // поиск максимума
+    
+    void clear(); // очистка дерева
+
+    
+
+
+    // Тренировка
 
     size_t height() const; // высота
     bool isBalanced() const; // проверка на сбалансирванность
-    void invert(); // инвертировать дерево
-    void clear(); // очистка дерева
 
     bool operator ==(const BinaryTree &tr2); // проверка двух деревьев на равенство
+    void invert(); // инвертировать дерево
+    void spiralPrint(); // спиральный обход 
+
+
+    void traversalBack(); // обратный обход
+    void toSummTree(); // преобразование в дерево сумм
 };
+
+
+template<class T>
+T BinaryTree<T>::toSummTree(Node *node){
+    if(!node) {
+        return 0;
+    }
+
+    std::cout << "ff" << std::endl;
+
+    T left = toSummTree(node->left.get());
+    T right = toSummTree(node->right.get());
+
+    node->data = left + right + node->data;
+
+    return node->data;
+
+}
+
+template<class T>
+void BinaryTree<T>::toSummTree(){
+    if(!root) return;
+
+   // std::cout << "here" << std::endl;
+    root->data = toSummTree(root.get());
+}
+
+template<class T>
+void BinaryTree<T>::printLevel(const std::unique_ptr<Node> &node, size_t cur_level, size_t print_level){
+    if(!node || cur_level < print_level) return;
+    
+    printLevel(node->left, cur_level - 1, print_level);
+
+    //std::cout << height << std::endl;
+    if(cur_level == print_level){
+        std::cout << node->data << " ";
+        return;
+    }
+    //std::cout << height << std::endl;
+
+    printLevel(node->right, cur_level - 1, print_level);
+}
+
+template<class T>
+void BinaryTree<T>::traversalBack(){
+    if(!root) return;
+
+    size_t h = height();
+
+    std::cout << h <<  std::endl;
+
+
+    size_t i = 0;
+
+    while(i <= h){
+        printLevel(root, h, i);
+        i++;
+    }
+
+    std::cout << std::endl;
+
+}
+
+
+template<class T>
+void BinaryTree<T>::spiralPrint(){
+    if(!root) return;
+
+    std::queue<Node*> q;
+    q.push(root.get());
+
+    bool left = true;
+
+    while(q.size() != 0){
+        Node *tmp = q.front();
+        std::cout << tmp->data << " ";
+        q.pop();
+        
+        if(left){
+            left = false;
+            if(tmp->left)
+                q.push(tmp->left.get());
+            if(tmp->right)
+                q.push(tmp->right.get());
+        }
+        else{
+            left = true;
+            if(tmp->left)
+                q.push(tmp->left.get());
+            if(tmp->right)
+                q.push(tmp->right.get());
+        }
+    }
+}
 
 template<class T>
 void BinaryTree<T>::clear(){
